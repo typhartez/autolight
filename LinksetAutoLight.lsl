@@ -1,5 +1,6 @@
-// LinksetAutoLight 1.2 - manages light points of linked prims
+// LinksetAutoLight 1.3 - manages light points of linked prims
 // Typhaine Artez (@sacrarium24.ru) - 2017/11/30
+// 1.3 2022/03/25 - make it working for a single prim (with several faces to control)
 // 1.2 2018/01/15 - manages several link names/faces
 //
 // Provided under Creative Commons Attribution-Non-Commercial-ShareAlike 4.0 International license.
@@ -15,7 +16,7 @@
 // Options
 
 // extended version, works on several parts of a linkset, with different options for each
-list MODFACES = [//];
+list MODFACES = [
     // prim name, face, show/hide, point light source, use particles, fullbright, glow
     // ex:
     // "!light", ALL_SIDES, FALSE, TRUE, FALSE, TRUE, 0.2
@@ -130,11 +131,16 @@ default {
             list names = llList2ListStrided(MODFACES, 0, -1, 7);
             list p;
             integer n = llGetNumberOfPrims();
-            while (n > 0) {
-                if (~llListFindList(names, llGetLinkName(n))) {
-                    lights += n;
+            if (1 == n) {
+                lights = 0;
+            }
+            else {
+                while (n > 0) {
+                    if (~llListFindList(names, llGetLinkName(n))) {
+                        lights += n;
+                    }
+                    --n;
                 }
-                --n;
             }
             if (SUNOPTS != ZERO_VECTOR) {
                 llOwnerSay("Initially using the sun to turn the light on/off.");
