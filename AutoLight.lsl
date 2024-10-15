@@ -1,5 +1,7 @@
-// AutoLight 1.2 - manages the light point of a prim
-// Typhaine Artez (@sacrarium24.ru) - 2017/11/30
+// AutoLight 1.3 - manages the light point of a prim
+// Typhaine Artez (@sacrarium24.ru) 2017-2021
+// 2017/11/30 - initial release
+// 2021/02/03 - added link parameter
 //
 // Provided under Creative Commons Attribution-Non-Commercial-ShareAlike 4.0 International license.
 // Please be sure you read and adhere to the terms of this license: https://creativecommons.org/licenses/by-nc-sa/4.0/
@@ -16,7 +18,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // Options
 
-// whith face to modify (-1 for ALL_SIDES)
+// which link to modify
+integer LINK = -1;  // initial value to disable the script until options are set
+// which face to modify (-1 for ALL_SIDES)
 integer FACE = -2; // initial value to disable the script until options are set
 // alter Fullbright with turning on/off
 integer BRIGHT = TRUE;
@@ -66,7 +70,7 @@ doLight(integer on) {
             ps = PARTICLES;
         }
         if (on == FALSE || llGetListLength(plbackup) == 0) { // save those settings when turned off
-            plbackup = llGetLinkPrimitiveParams(LINK_THIS, [PRIM_POINT_LIGHT]);
+            plbackup = llGetLinkPrimitiveParams(LINK, [PRIM_POINT_LIGHT]);
         }
         list p = [PRIM_GLOW, (integer)FACE, g, PRIM_POINT_LIGHT, l] + llList2List(plbackup, 1, -1);
         if ((integer)BRIGHT) {
@@ -79,7 +83,7 @@ doLight(integer on) {
                 PRIM_COLOR, ALL_SIDES, <1., 1., 1.>, a
             ];
         }
-        llSetLinkPrimitiveParamsFast(LINK_THIS, p);
+        llSetLinkPrimitiveParamsFast(LINK, p);
         llLinkParticleSystem(LINK_THIS, ps);
     }
 }
@@ -112,13 +116,13 @@ default {
         }
     }
     state_entry() {
-        if (FACE == -2) {
-            llOwnerSay("Face is not set in options. Light system disabled.");
+        if (!~LINK) {
+            llOwnerSay("Link is not set in options. Light system disabled.");
         }
         else {
-            if (~SHOW) {
+/*            if (~SHOW) {
                 llSetLinkTextureAnim(SHOW, ANIM_ON | LOOP, ALL_SIDES, 4, 4, 0, 0, 20.0);
-            }
+            }*/
             if (USESUN) {
                 active = -1;
                 llOwnerSay("Initially using the sun to turn the light on/off.");
